@@ -11,9 +11,13 @@ export class JSONSerializer implements Serializer {
   private offset: number;
 
   public constructor(version: number, src?: Array<any>) {
+    if (Array.isArray(src) && !src.length) {
+      throw new Error('JSONSerializer expects an array of data but got empty array');
+    }
+
     this.version = version;
-    this.loading = !Boolean(src);
-    this.source = src ? [...src] : [];
+    this.loading = !src;
+    this.source = src || [];
     this.offset = 0;
   }
 
@@ -30,13 +34,11 @@ export class JSONSerializer implements Serializer {
 
   private op = <T>(k: T): T => {
     if (this.loading) {
-      this.source[this.offset] = k;
-      this.offset++;
+      return this.source[this.offset++];
     } else {
       this.source.push(k);
+      return k;
     }
-
-    return k;
   }
 
   uint8 = this.op;

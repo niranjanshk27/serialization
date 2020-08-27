@@ -1,19 +1,17 @@
 import { JSONSerializer } from '../src/serializers/JSONSerializer';
 
-const primitiveMethods = [
-  'uint8',
-  'uint16',
-  'uint32',
-  'int8',
-  'int16',
-  'int32',
-  'float',
-  'double',
-  'string',
-  'bool'
-];
-
-const primitiveValues = [255, 65535, 4294967295, 127, 32767, 2147483647, 10.327, 4244.546, '12', false];
+const primitives = [
+  ['uint8', 255],
+  ['uint16', 65535],
+  ['uint32', 4294967295],
+  ['int8', 127],
+  ['int16', 32767],
+  ['int32', 2147483647],
+  ['float', 10.327],
+  ['double', 4244.546],
+  ['string', '12'],
+  ['bool', false],
+]
 
 describe('Check JSONSerializer', () => {
   it('check for version', () => {
@@ -21,40 +19,26 @@ describe('Check JSONSerializer', () => {
     expect(serializer.version).toBe(1);
   });
 
-  it('check for all primitives when src is provided', () => {
-    const src = [1, '2', true, null, { a: 1 }, [1, 2]];
+  it('check for all primitives in read mode', () => {
+    const src = [1, '2', true];
     const serializer = new JSONSerializer(1, src);
 
-    primitiveValues.forEach((v, idx) => {
-      const method = primitiveMethods[idx];
+    expect(serializer.isLoading).toBeFalsy();
+
+    primitives.forEach(([method, value]) => {
       // @ts-ignore
-      expect(serializer[method](v)).toBe(v);
+      expect(serializer[method](value)).toBe(value);
     });
 
-    expect(serializer.toJSON()).toEqual([...src, ...primitiveValues]);
+    expect(serializer.toJSON()).toEqual(src);
   });
 
-  it('check for all primitives when src is not provided', () => {
+  it('check for all primitives in write mode', () => {
     const serializer = new JSONSerializer(1);
-
-    primitiveValues.forEach((v, idx) => {
-      const method = primitiveMethods[idx];
-      // @ts-ignore
-      expect(serializer[method](v)).toBe(v);
-    });
-  
-    expect(serializer.toJSON()).toEqual(primitiveValues);
+    expect(serializer.isLoading).toBeTruthy();
   });
 
-  it('check for all primitives when a blank array is provided', () => {
-    const serializer = new JSONSerializer(1, []);
-
-    primitiveValues.forEach((v, idx) => {
-      const method = primitiveMethods[idx];
-      // @ts-ignore
-      expect(serializer[method](v)).toBe(v);
-    });
-  
-    expect(serializer.toJSON()).toEqual(primitiveValues);
+  it('should throw error when provided with empty payload', () => {
+    expect(() => new JSONSerializer(1, [])).toThrow(Error);
   });
 });
