@@ -22,7 +22,7 @@ describe('Check JSONSerializer', () => {
   });
 
   it('check for all primitives when src is provided', () => {
-    const src = [1, '2', true, null];
+    const src = [1, '2', true, null, { a: 1 }, [1, 2]];
     const serializer = new JSONSerializer(1, src);
 
     primitiveValues.forEach((v, idx) => {
