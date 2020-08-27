@@ -2,8 +2,8 @@
 Data serialization library for communication and storage purpose with versioning.
 
 The library is focused on solving two specific issues:
-1. The application version mismatch
-    Data serialization is a complicated task, specially when you are maintaining a
+1. **The application version mismatch**\
+   Data serialization is a complicated task, specially when you are maintaining a
     project for a long time. With addition of a new feature, it becomes complicated
     to keep your data readable between two versions of your same software.
     *. You have saved your data using older version of your software, which would pose
@@ -13,7 +13,7 @@ The library is focused on solving two specific issues:
        time. In rare case scenario (like our hotspot games), the server could be an
        older version whereas the client might have been a newer version.
 
-2. Loading class instances from serializable data
+2. **Loading class instances from serializable data**\
    While loading data either from storage or a communication channel, it is always
    extra work to map that data to particular instance. We try to solve that with
    two different approach:
@@ -34,7 +34,7 @@ The library is focused on solving two specific issues:
         }
       }
       ```
-** Side Goal **
+**Side Goal**\
 When it comes to serialization, most of the time, the error arises due to performing
 data reading and writing with two different codes. We have tried to minimize that
 by doing both reading and writing with the same code. For example, a typical object
