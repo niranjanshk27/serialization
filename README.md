@@ -18,7 +18,7 @@ Use the basic function from `Serializer` for primary data type serialization:
 
 Properties available in `Serializer`
 * `version` The version of the serializer typically based on the app.
-* `loading` The mode of the serializer. Based on the mode, the
+* `isLoading` The mode of the serializer. Based on the mode, the
 data is either read (`loading`) or written.
 
 ## Standard Usage
