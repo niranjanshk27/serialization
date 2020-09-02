@@ -17,9 +17,22 @@ export class JSONSerializer implements Serializer {
     this.offset = 0;
   }
 
+  /**
+   * Prepare the serializer for another write cycle
+   */
   reset() {
     this.offset = 0;
     this.source = [];
+    this.loading = false;
+  }
+
+  /**
+   * Prepare the serializer for another load cycle
+   * @param source
+   */
+  load(source: Array<any>) {
+    this.offset = 0;
+    this.source = source;
     this.loading = true;
   }
 
