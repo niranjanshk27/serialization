@@ -11,8 +11,12 @@ export class JSONSerializer implements Serializer {
   private offset: number;
 
   public constructor(version: number, src?: Array<any>) {
+    if (Array.isArray(src) && !src.length) {
+      throw new Error('JSONSerializer expects an array of data but got empty array');
+    }
+
     this.version = version;
-    this.loading =  src ? false: true;
+    this.loading = !src;
     this.source = src || [];
     this.offset = 0;
   }
