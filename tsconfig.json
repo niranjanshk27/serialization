@@ -1,22 +1,23 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "es5",
-    "module":"es2015",
-    "lib": ["es2015", "es2016", "es2017", "dom"],
+    "target": "es2017",
+    "lib": ["es2017"],
     "types": ["node", "jest"],
-    "strict": true,
-    "sourceMap": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "outDir": "dist",
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+    "sourceMap": true
   },
   "include": [
-    "src"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
   ]
 }
