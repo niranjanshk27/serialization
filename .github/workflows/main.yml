@@ -24,4 +24,4 @@ jobs:
       - name: Release Workflow
         uses: bhoos/action-release@v1
         env:
-          NPM_PKG_GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          NPM_PKG_GITHUB_TOKEN: ${{ secrets.NPM_PKG_GITHUB_TOKEN }}
