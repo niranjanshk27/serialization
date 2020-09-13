@@ -69,4 +69,20 @@ export interface Serializer {
    * The version number for the serializer
    */
   readonly version: number;
+
+  /**
+   * Mark the current position and return a function that
+   * would revert back to the marked position, useful in
+   * case of rolling back on errors
+   */
+  mark(): () => void;
+
+  /**
+   * Keep track of the length for all the write that
+   * happens within the fn and writes it back to the
+   * start of the serialization without disturbing
+   * the serialization flow
+   * @param fn
+   */
+  trackLength<T>(fn: (length: number) => T): T;
 }

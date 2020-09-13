@@ -8,6 +8,9 @@
     "clean": "rimraf dist",
     "build": "tsc"
   },
+  "dependencies": {
+    "@bhoos/utils": "^1.0.0"
+  },
   "repository": "git@github.com:bhoos/serialization",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
