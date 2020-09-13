@@ -17,7 +17,7 @@ The library is focused on solving two specific issues:
     While loading data either from storage or a communication channel, it is always
     extra work to map that data to particular instance. We try to solve that with
     two different approach:
-    1. Make the classes `Serializable` and use `SerialiableFactory` for serialization,
+    1. Make the classes `Serializable` and use `Oracle` for serialization,
        identification and creation of class instances.
     2. For certain scalar objects (ex: ComplexNumber), treat them like a primary data
        type and create helper functions `serializeComplexNumber` to serialize these objects.
@@ -99,28 +99,25 @@ class ComplexNumber implements Serializable {
 ```
 
 ## Application Usage
-The standard JSON and Buffer based serializers are provided
-with the library. If any other format are required, they
-can be created by implementing the `Serializer` interface.
 ```typescript
 class CommunicationChannel {
-  private factory = new SerializableFactor();
+  private oracle = new Oracle();
 
   constructor(version: number) {
     this.version = version;
-    this.factory.register(1, ComplexNumber);
+    this.oracle.register(1, ComplexNumber);
   }
 
   sendObject(obj: Serializable) {
     // Initialize buffer serializer for writing
     const serializer = new BufferSerializer(this.version, 1000);
-    this.factory.serialize(serializer, obj);
+    this.oracle.serialize(serializer, obj);
     this.channel.send(serializer.getBuffer());
   }
 
   receiveObject(buffer: Buffer) {
     const serializer = new BufferSerializer(this.version, buffer);
-    const obj = this.factory.serialize(serializer, null);
+    const obj = this.oracle.serialize(serializer, null);
     return obj;
   }
 }
@@ -131,4 +128,8 @@ class CommunicationChannel {
   1. Ex: `serializeArray(serializer.string, serializer, source)`;
   2. Ex: `serializeArray(this.factory.bind(serializer), serializer, objArray)`
 
+## Serializers
+The standard JSON (`JSONSerializer`) and Buffer (binary) (`BufferSerializer`) serializers are provided
+with the library. If any other format are required, they
+can be created by implementing the `Serializer` interface.
 
