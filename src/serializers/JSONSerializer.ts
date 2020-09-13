@@ -1,33 +1,21 @@
-import { Serializer } from '../Serializer';
+import { StdSerializer } from './StdSerializer';
 
 /**
  * A lax serializer based on JSON, using array to store
  * all values
  */
-export class JSONSerializer implements Serializer {
-  public readonly version: number;
-  private loading: boolean;
+export class JSONSerializer extends StdSerializer {
   private source: Array<any>;
-  private offset: number;
 
   public constructor(version: number, src?: Array<any>) {
+    super(version);
     if (Array.isArray(src) && !src.length) {
       throw new Error('JSONSerializer expects an array of data but got empty array');
     }
 
-    this.version = version;
     this.loading = !src;
     this.source = src || [];
     this.offset = 0;
-  }
-
-  /**
-   * Prepare the serializer for another write cycle
-   */
-  reset() {
-    this.offset = 0;
-    this.source = [];
-    this.loading = false;
   }
 
   /**
@@ -43,13 +31,11 @@ export class JSONSerializer implements Serializer {
   toJSON() { return this.source };
   toString() { return JSON.stringify(this.source) };
 
-  public get isLoading() { return this.loading }
-
   private op = <T>(k: T): T => {
     if (this.loading) {
       return this.source[this.offset++];
     } else {
-      this.source.push(k);
+      this.source[this.offset++] = k;
       return k;
     }
   }
