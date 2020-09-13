@@ -1,21 +1,18 @@
 import { strToUint8, uint8ToStr } from '@bhoos/utils';
-import { Serializer } from '../Serializer';
+import { StdSerializer } from './StdSerializer';
 /**
  * Buffer based implementation for serializer. Can be used for
  * binary serialization while saving files, or communicating
  * over TCP/UDP network.
  */
-export class BufferSerializer implements Serializer {
+export class BufferSerializer extends StdSerializer {
   private readonly buff: Buffer;
-  public readonly version: number;
-  private loading: boolean;
-  private offset: number;
 
   constructor(version: number, size: number);
   constructor(version: number, buff: Buffer);
   constructor(version: number, buff: Buffer, offset: number);
   constructor(version: number, buff: Buffer | number, offset: number = 0) {
-    this.version = version;
+    super(version);
     if (typeof buff === 'number') {
       this.loading = false;
       this.buff = Buffer.allocUnsafe(buff);
@@ -28,44 +25,6 @@ export class BufferSerializer implements Serializer {
   }
 
   getBuffer() { return this.buff.slice(0, this.offset); }
-
-  get length() {
-    return this.offset;
-  }
-
-  mark() {
-    const marker = this.offset;
-    return () => {
-      this.offset = marker;
-    }
-  }
-
-  trackLength<T>(fn: (length: number) => T) {
-    const mark = this.offset;
-    let length = this.uint16(0);
-    const lengthMarker = this.offset;
-    try {
-      const r = fn(length);
-      if (!this.isLoading) {
-        length = this.offset - lengthMarker;
-        this.offset = mark;
-        this.uint16(length);
-      }
-      // Keep the offset at right position after tracking
-      this.offset = lengthMarker + length;
-      return r;
-    } catch (err) {
-      // Reset the offset to original position
-      this.offset = mark;
-      throw err;
-    }
-  }
-
-  end() {
-    this.loading = true;
-  }
-
-  get isLoading() { return this.loading }
 
   op = (
     size: number,
