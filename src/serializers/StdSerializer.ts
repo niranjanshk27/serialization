@@ -1,4 +1,6 @@
 
+import { serialize } from "v8";
+import { Serializable } from "../Serializable";
 import { Serializer } from "../Serializer";
 
 export abstract class StdSerializer implements Serializer {
@@ -40,6 +42,37 @@ export abstract class StdSerializer implements Serializer {
       this.offset = mark;
       throw err;
     }
+  }
+
+  obj<T extends {}>(obj: T, serialize: (obj: T, serializer: Serializer) => void): T {
+    const mark = this.offset;
+    let length = this.uint16(0);
+    const lengthMarker = this.offset;
+
+    const res: T = obj || {} as T;
+
+    serialize(res, this);
+
+    if (!this.isLoading) {
+      length = this.offset - lengthMarker;
+      this.offset = mark;
+      this.uint16(length);
+    }
+
+    this.offset = lengthMarker + length;
+
+    return res;
+  }
+
+  array<T>(array: T[], serialize: (item: T, serializer: Serializer) => T): T[] {
+    const res: T[] = array || [];
+
+    const length = this.uint16(res.length);
+    for (let i = 0; i < length; i += 1) {
+      res[i] = serialize(res[i], this);
+    }
+
+    return res;
   }
 
   end() {

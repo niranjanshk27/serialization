@@ -59,6 +59,19 @@ export interface Serializer {
    */
   string(k: string): string;
 
+  /**
+   * Serialize an object with helper function
+   * @param obj
+   * @param serialize
+   */
+  obj<T extends {}>(obj: T, serialize: (res: T, serializer: Serializer) => void): T;
+
+  /**
+   * Serialize an arry with helper function
+   * @param array
+   * @param serialize
+   */
+  array<T extends any>(array: T[], serialize: (res: T, serializer: Serializer) => T): T[];
 
   /**
    * Flag set when the serializer is in read mode
@@ -74,6 +87,7 @@ export interface Serializer {
    * Mark the current position and return a function that
    * would revert back to the marked position, useful in
    * case of rolling back on errors
+   * @deprecated Not required after addition of obj and array
    */
   mark(): () => void;
 
@@ -83,6 +97,7 @@ export interface Serializer {
    * start of the serialization without disturbing
    * the serialization flow
    * @param fn
+   * @deprecated Not required after addition of obj and array
    */
   trackLength<T>(fn: (length: number) => T): T;
 }
