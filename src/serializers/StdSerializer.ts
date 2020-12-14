@@ -75,6 +75,15 @@ export abstract class StdSerializer implements Serializer {
     return res;
   }
 
+  json<T>(k: T): T {
+    if (this.isLoading) {
+      return JSON.parse(this.string(''));
+    } else {
+      this.string(JSON.stringify(k));
+      return k;
+    }
+  }
+
   end() {
     this.loading = true;
   }

@@ -60,6 +60,12 @@ export interface Serializer {
   string(k: string): string;
 
   /**
+   * Serialize data as json (array, number, string, object)
+   * @param k any jsonizable data
+   */
+  json<T>(k: T): T;
+
+  /**
    * Serialize an object with helper function
    * @param obj
    * @param serialize
