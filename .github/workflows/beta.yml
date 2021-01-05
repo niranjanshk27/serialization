@@ -1,0 +1,31 @@
+name: Beta Release Workflow
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  beta-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git config user.name bhoos-devops
+          git config user.email devops@bhoos.com
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@bhoos'
+
+      - name: Publish a beta release
+        run: |
+          yarn
+          yarn build
+          yarn version --prerelease --preid beta
+          yarn publish --tag beta
+          git push
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
