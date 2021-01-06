@@ -48,7 +48,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release Branch and Generate PR
-        if: !contains(env.RELEASE_BRANCH, env.RELEASE_VERSION)
+        if: ! contains(env.RELEASE_BRANCH, env.RELEASE_VERSION)
         run: |
           # Create a remote release branch
           gh api repos/:owner/:repo/git/refs -F ref="refs/heads/${RELEASE_BRANCH}" -F sha="${{ github.sha }}"
