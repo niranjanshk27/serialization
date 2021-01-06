@@ -37,11 +37,11 @@ jobs:
           yarn publish --tag beta
           git push
 
-          # The beta version would have been set by the
+          # The beta version would have been set by now
           fullVersion=$(git describe --tags)
           releaseVersion=${fullVersion:0:${#fullVersion}-7}
-          releaseBranch=release-${releaseVersion}
-          remoteBranch=$(git show-branch remotes/origin/master)
+          releaseBranch=releases/${releaseVersion}
+          remoteBranch=$(git show-branch remotes/origin/${releaseBranch})
           echo "RELEASE_VERSION=${releaseVersion}" >> $GITHUB_ENV
           echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
           echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
@@ -54,7 +54,7 @@ jobs:
           # Create a remote release branch
           gh api repos/:owner/:repo/git/refs -F ref="refs/heads/${RELEASE_BRANCH}" -F sha="${{ github.sha }}"
           # Create a PR from master branch
-          gh pr create --title "Release ${release}" --body "Automatic PR used to create a prerelease from beta. Once the release is ready for staging, fix merge conflicts on package.json by accepting the incoming changes. A prerelease is published with `next` tag generated when this PR is merged. To move the release into production, Use the github release manager and publish the release unchecking the prerelease flag." --base ${RELEASE_BRANCH}
+          gh pr create --title "Release ${RELEASE_VERSION}" --body "Automatic PR used to create a prerelease from beta. Once the release is ready for staging, fix merge conflicts on package.json by accepting the incoming changes. A prerelease is published with **next** tag generated when this PR is merged. To move the release into production, Use the github release manager and publish the release unchecking the prerelease flag." --base ${RELEASE_BRANCH}
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
