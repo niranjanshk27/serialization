@@ -41,7 +41,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Generate PR for release
-        if: endsWith(${{ env.RELEASE_TAG }}, '-beta.0')
+        if: endsWith(env.RELEASE_TAG, '-beta.0')
         run: |
           release=${RELEASE_TAG:0:${#RELEASE_TAG}-7}
           gh pr create --title "Release ${release}" --body "Automatic PR used to create a prerelease from beta. Once the release is ready for staging, fix merge conflicts on package.json by accepting the incoming changes. A prerelease is published with @next tag generated when this PR is merged. To move the release into production, Use the github release manager and publish the release unchecking the prerelease flag." --base release
