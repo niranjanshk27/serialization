@@ -41,7 +41,7 @@ jobs:
           fullVersion=$(git describe --tags)
           releaseVersion=${fullVersion:0:${#fullVersion}-7}
           releaseBranch=releases/${releaseVersion}
-          remoteBranch=$(git show-branch remotes/origin/${releaseBranch})
+          remoteBranch=$(git ls-remote origin ${releaseBranch})
           echo "RELEASE_VERSION=${releaseVersion}" >> $GITHUB_ENV
           echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
           echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
