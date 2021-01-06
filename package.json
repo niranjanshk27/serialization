@@ -1,10 +1,13 @@
 {
   "name": "@bhoos/serialization",
-  "version": "1.0.4",
+  "version": "1.0.5-beta.0",
   "description": "Data Serialization Library",
   "main": "dist/index.js",
   "react-native": "src/index.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "test": "jest",
     "clean": "rimraf dist",
