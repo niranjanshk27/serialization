@@ -4,6 +4,7 @@
   "description": "Data Serialization Library",
   "main": "dist/index.js",
   "react-native": "src/index.ts",
+  "files": ["dist", "src"],
   "scripts": {
     "test": "jest",
     "clean": "rimraf dist",

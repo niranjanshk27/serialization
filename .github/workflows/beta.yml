@@ -20,9 +20,18 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@bhoos'
 
-      - name: Publish a beta release
+      # Install packages with PERSONAL_ACCESS_TOKEN since it might
+      # need access to other repos
+      - name: Install Packages
+        run: yarn
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      # Publish with GITHUB_TOKEN, since this also requies pushing
+      # to the repository and we don't want to trigger another
+      # action run, which happens when PERSONAL_ACCESS_TOKEN is used
+      - name: Publish Beta
         run: |
-          yarn
           yarn build
           yarn version --prerelease --preid beta
           yarn publish --tag beta
