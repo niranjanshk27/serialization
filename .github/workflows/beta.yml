@@ -39,16 +39,17 @@ jobs:
 
           # The beta version would have been set by the
           fullVersion=$(git describe --tags)
-          releaseVersion=${fullVersion}:0:${#fullVersion}-7}
-          releaseName=release-${release}
-          releaseBranch=$(git show-branch remotes/origin/master)
+          releaseVersion=${fullVersion:0:${#fullVersion}-7}
+          releaseBranch=release-${release}
+          remoteBranch=$(git show-branch remotes/origin/master)
           echo "RELEASE_VERSION=${releaseVersion}" >> $GITHUB_ENV
           echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
+          echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release Branch and Generate PR
-        if: contains(env.RELEASE_BRANCH, env.RELEASE_VERSION) != true
+        if: contains(env.REMOTE_BRANCH, env.REMOTE_BRANCH) != true
         run: |
           # Create a remote release branch
           gh api repos/:owner/:repo/git/refs -F ref="refs/heads/${RELEASE_BRANCH}" -F sha="${{ github.sha }}"
