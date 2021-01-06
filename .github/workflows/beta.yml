@@ -36,15 +36,25 @@ jobs:
           yarn version --prerelease --preid beta
           yarn publish --tag beta
           git push
-          echo "RELEASE_TAG=$(git describe --tags)" >> $GITHUB_ENV
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Generate PR for release
-        if: endsWith(env.RELEASE_TAG, '-beta.0')
+          # The beta version would have been set by the
+          fullVersion=$(git describe --tags)
+          releaseVersion=${fullVersion}:0:${#fullVersion}-7}
+          releaseName=release-${release}
+          releaseBranch=$(git show-branch remotes/origin/master)
+          echo "RELEASE_VERSION=${releaseVersion}" >> $GITHUB_ENV
+          echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release Branch and Generate PR
+        if: !contains(env.RELEASE_BRANCH, env.RELEASE_VERSION)
         run: |
-          release=${RELEASE_TAG:0:${#RELEASE_TAG}-7}
-          gh pr create --title "Release ${release}" --body "Automatic PR used to create a prerelease from beta. Once the release is ready for staging, fix merge conflicts on package.json by accepting the incoming changes. A prerelease is published with `next` tag generated when this PR is merged. To move the release into production, Use the github release manager and publish the release unchecking the prerelease flag." --base release
+          # Create a remote release branch
+          gh api repos/:owner/:repo/git/refs -F ref="refs/heads/${RELEASE_BRANCH}" -F sha="${{ github.sha }}"
+          # Create a PR from master branch
+          gh pr create --title "Release ${release}" --body "Automatic PR used to create a prerelease from beta. Once the release is ready for staging, fix merge conflicts on package.json by accepting the incoming changes. A prerelease is published with `next` tag generated when this PR is merged. To move the release into production, Use the github release manager and publish the release unchecking the prerelease flag." --base ${RELEASE_BRANCH}
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
