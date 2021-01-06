@@ -6,7 +6,7 @@ on:
       - 'releases/**'
 
 jobs:
-  release:
+  staging-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
           yarn build
           yarn version --patch
           yarn publish --tag next
-          git push origin release
+          git push
           echo "RELEASE_TAG=$(git describe --tags)" >> $GITHUB_ENV
 
         env:
