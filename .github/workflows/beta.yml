@@ -36,5 +36,15 @@ jobs:
           yarn version --prerelease --preid beta
           yarn publish --tag beta
           git push
+          echo "RELEASE_TAG=$(git describe --tags)" >> $GITHUB_ENV
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Generate PR for release
+        if: endsWith(${{ env.RELEASE_TAG }}, '-beta.0')
+        run: |
+          release=${RELEASE_TAG:0:}
+          gh pr create --title "Release ${RELEASE_TAG:0:${#RELEASE_TAG}-6}" --body "" --base release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
