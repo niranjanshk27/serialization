@@ -44,6 +44,6 @@ export class Oracle {
     if (id === 0) return null;
 
     const res = obj || this.createObject(id);
-    return serializer.obj(res, k => k.serialize(serializer));
+    return serializer.obj(res, k => k.serialize(serializer, this));
   }
 }
