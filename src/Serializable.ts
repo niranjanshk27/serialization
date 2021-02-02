@@ -1,3 +1,4 @@
+import { Oracle } from './Oracle';
 import { Serializer } from './Serializer';
 
 /**
@@ -9,5 +10,5 @@ export interface Serializable {
    * Serialize this instance with the given serializer
    * @param serializer
    */
-  serialize(serializer: Serializer): void;
+  serialize(serializer: Serializer, oracle: Oracle): void;
 }
