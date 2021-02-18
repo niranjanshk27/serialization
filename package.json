@@ -11,7 +11,8 @@
   "scripts": {
     "test": "jest",
     "clean": "rimraf dist",
-    "build": "tsc"
+    "build": "yarn clean && tsc",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@bhoos/utils": "^1.0.0"
