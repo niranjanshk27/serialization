@@ -1,6 +1,6 @@
 {
   "name": "@bhoos/serialization",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Data Serialization Library",
   "main": "dist/index.js",
   "react-native": "src/index.ts",
