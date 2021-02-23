@@ -13,7 +13,7 @@ export class JSONSerializer extends StdSerializer {
       throw new Error('JSONSerializer expects an array of data but got empty array');
     }
 
-    this.loading = !src;
+    this.loading = !!src;
     this.source = src || [];
     this.offset = 0;
   }
