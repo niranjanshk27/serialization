@@ -1,4 +1,4 @@
-import { StdSerializer } from './StdSerializer';
+import { StdSerializer } from './StdSerializer.js';
 
 /**
  * A lax serializer based on JSON, using array to store

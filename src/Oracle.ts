@@ -1,5 +1,5 @@
-import { Serializable } from './Serializable';
-import { Serializer } from './Serializer';
+import { Serializable } from './Serializable.js';
+import { Serializer } from './Serializer.js';
 
 type SerializableClass<T extends Serializable> = (new (...args: any[]) => T) & { SERIAL_ID?: number };
 

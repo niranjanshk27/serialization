@@ -1,7 +1,7 @@
-export { Serializable } from './Serializable';
-export { Serializer } from './Serializer';
+export { Serializable } from './Serializable.js';
+export { Serializer } from './Serializer.js';
 
-export { BufferSerializer } from './serializers/BufferSerializer';
-export { JSONSerializer } from './serializers/JSONSerializer';
+export { BufferSerializer } from './serializers/BufferSerializer.js';
+export { JSONSerializer } from './serializers/JSONSerializer.js';
 
-export { Oracle } from './Oracle';
+export { Oracle } from './Oracle.js';

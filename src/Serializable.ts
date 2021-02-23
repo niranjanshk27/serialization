@@ -1,5 +1,5 @@
-import { Oracle } from './Oracle';
-import { Serializer } from './Serializer';
+import { Oracle } from './Oracle.js';
+import { Serializer } from './Serializer.js';
 
 /**
  * A serializable contract to be used with `SerializableFactory` for

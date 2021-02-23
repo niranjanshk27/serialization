@@ -1,5 +1,5 @@
 import { strToUint8, uint8ToStr } from '@bhoos/utils';
-import { StdSerializer } from './StdSerializer';
+import { StdSerializer } from './StdSerializer.js';
 /**
  * Buffer based implementation for serializer. Can be used for
  * binary serialization while saving files, or communicating
