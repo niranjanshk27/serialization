@@ -1,7 +1,4 @@
-
-import { serialize } from "v8";
-import { Serializable } from "../Serializable";
-import { Serializer } from "../Serializer";
+import { Serializer } from "../Serializer.js";
 
 export abstract class StdSerializer implements Serializer {
   public readonly version: number;

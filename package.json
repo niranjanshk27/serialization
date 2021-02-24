@@ -3,16 +3,24 @@
   "version": "1.0.18",
   "description": "Data Serialization Library",
   "main": "dist/index.js",
+  "module": "es6/index.js",
   "react-native": "src/index.ts",
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./es6/index.js"
+  },
   "files": [
     "dist",
-    "src"
+    "src",
+    "es6"
   ],
   "scripts": {
     "test": "jest",
-    "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
-    "prepublishOnly": "yarn build"
+    "clean": "rimraf dist && rimraf es6",
+    "build:cjs": "tsc",
+    "build:es6": "mkdir -p es6 && echo '{\"type\": \"module\"}' > es6/package.json && tsc --module es6 --outDir es6",
+    "build": "yarn build:cjs && yarn build:es6",
+    "prepublishOnly": "yarn clean && yarn build"
   },
   "dependencies": {
     "@bhoos/utils": "^1.0.0"
@@ -24,11 +32,9 @@
   "author": "Ranjan Shrestha <ranjan@sharingapples.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^26.0.10",
     "@types/node": "^14.6.1",
-    "jest": "^26.4.2",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.3.0",
-    "typescript": "^4.0.2"
+    "typescript": "^4.1.0"
   }
 }
