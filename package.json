@@ -1,6 +1,6 @@
 {
   "name": "@bhoos/serialization",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Data Serialization Library",
   "main": "dist/index.js",
   "module": "es6/index.js",
