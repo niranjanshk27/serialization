@@ -18,6 +18,10 @@ export class JSONSerializer extends StdSerializer {
     this.offset = 0;
   }
 
+  get isEmpty() {
+    return this.offset >= this.source.length;
+  }
+
   /**
    * Prepare the serializer for another load cycle
    * @param source

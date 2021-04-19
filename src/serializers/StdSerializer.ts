@@ -4,9 +4,32 @@ export abstract class StdSerializer implements Serializer {
   public readonly version: number;
   protected loading: boolean;
   protected offset: number;
+  private reference: number;
 
   constructor(version: number) {
     this.version = version;
+  }
+
+  setIntervalReference(reference: number) {
+    this.reference = reference;
+  }
+
+  /**
+   * Special data type for encoding/decoding interval values.
+   * In network communications, packet losses are inevitable
+   * so it is possible that a packet sent at time 't' may have
+   * an additional delay (ignoring latency). The interval type
+   * accomodates such delay, by using a timestamp reference.
+   * @param ms 
+   * @returns 
+   */
+  interval(ms: number) {
+    if (this.reference === undefined) {
+      throw new Error('Interval serialization requires reference to be set first');
+    }
+
+    const k = this.uint32(this.reference);
+    return this.uint32(ms) - (k - this.reference);
   }
 
   get length() {
@@ -97,4 +120,6 @@ export abstract class StdSerializer implements Serializer {
   abstract double(k: number): number;
   abstract bool(k: boolean): boolean;
   abstract string(k: string): string;
+
+  abstract isEmpty: boolean;
 }

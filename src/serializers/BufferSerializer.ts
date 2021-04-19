@@ -10,18 +10,22 @@ export class BufferSerializer extends StdSerializer {
 
   constructor(version: number, size: number);
   constructor(version: number, buff: Buffer);
-  constructor(version: number, buff: Buffer, offset: number);
-  constructor(version: number, buff: Buffer | number, offset: number = 0) {
+  constructor(version: number, buff: Buffer, offset: number, isLoading?: boolean);
+  constructor(version: number, buff: Buffer | number, offset: number = 0, isLoading?: boolean) {
     super(version);
     if (typeof buff === 'number') {
       this.loading = false;
       this.buff = Buffer.allocUnsafe(buff);
       this.offset = 0;
     } else {
-      this.loading = true;
+      this.loading = isLoading !== undefined ? isLoading : true;
       this.buff = buff;
       this.offset = offset;
     }
+  }
+
+  get isEmpty(): boolean {
+    return this.offset >= this.buff.byteLength
   }
 
   getBuffer() { return this.buff.slice(0, this.offset); }

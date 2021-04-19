@@ -1,4 +1,6 @@
 export interface Serializer {
+  readonly isEmpty: boolean;
+
   /**
    * Serialize 8 bit signed number -128 to 127
    * @param k The number to write, ignored while reading
