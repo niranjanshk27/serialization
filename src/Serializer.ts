@@ -82,6 +82,19 @@ export interface Serializer {
   array<T extends any>(array: T[], serialize: (res: T, serializer: Serializer) => T): T[];
 
   /**
+   * Serialize an array with a limit. While writing an array, it
+   * is possible that the entire array might not fit on a single
+   * packet and need to work with whatever could be fitted.
+   * 
+   * @param array 
+   * @param offset 
+   * @param serialize 
+   * @returns The serialized array
+   */
+  larray<T extends any>(array: T[], offset: number, serialize: (res: T, serializer: Serializer) => T): number;
+
+
+  /**
    * Flag set when the serializer is in read mode
    */
   readonly isLoading: boolean;
@@ -91,13 +104,7 @@ export interface Serializer {
    */
   readonly version: number;
 
-  /**
-   * Mark the current position and return a function that
-   * would revert back to the marked position, useful in
-   * case of rolling back on errors
-   * @deprecated Not required after addition of obj and array
-   */
-  mark(): () => void;
+  track<T>(fn: () => T): T;
 
   /**
    * Keep track of the length for all the write that
@@ -105,7 +112,6 @@ export interface Serializer {
    * start of the serialization without disturbing
    * the serialization flow
    * @param fn
-   * @deprecated Not required after addition of obj and array
    */
-  trackLength<T>(fn: (length: number) => T): T;
+  trackLength(fn: (length: number) => number): number;
 }

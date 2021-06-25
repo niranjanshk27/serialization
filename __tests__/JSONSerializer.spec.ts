@@ -1,4 +1,4 @@
-import { JSONSerializer } from '../src/serializers/JSONSerializer';
+import { JSONSerializer } from '../dist/serializers/JSONSerializer.js';
 
 const primitives = [
   ['uint8', 255],
@@ -23,19 +23,16 @@ describe('Check JSONSerializer', () => {
     const src = [1, '2', true];
     const serializer = new JSONSerializer(1, src);
 
-    expect(serializer.isLoading).toBeFalsy();
+    expect(serializer.isLoading).toBeTruthy();
 
-    primitives.forEach(([method, value]) => {
-      // @ts-ignore
-      expect(serializer[method](value)).toBe(value);
-    });
-
-    expect(serializer.toJSON()).toEqual(src);
+    expect(serializer.uint8(0)).toBe(src[0]);
+    expect(serializer.string('')).toBe('2');
+    expect(serializer.bool(false)).toBe(true);
   });
 
   it('check for all primitives in write mode', () => {
     const serializer = new JSONSerializer(1);
-    expect(serializer.isLoading).toBeTruthy();
+    expect(serializer.isLoading).toBeFalsy();
   });
 
   it('should throw error when provided with empty payload', () => {

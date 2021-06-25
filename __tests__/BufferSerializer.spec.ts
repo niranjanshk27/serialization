@@ -1,4 +1,7 @@
-import { BufferSerializer } from '../src/serializers/BufferSerializer';
+import { BufferSerializer } from '../dist/serializers/BufferSerializer.js';
+import { Oracle } from '../dist/Oracle.js';
+import { Serializable } from '../dist/Serializable.js';
+import { Serializer } from '../dist/Serializer.js';
 
 const primitives = [
   ['int8', 255, 'readInt8', 'writeInt8'],
@@ -10,6 +13,25 @@ const primitives = [
   ['float', 10.327, 'readFloatBE', 'writeFloatBE'],
   ['double', 4244.546, 'readDoubleBE', 'writeDoubleBE'],
 ];
+
+const oracle = new Oracle();
+class SampleObj implements Serializable {
+  num: number;
+  str: string;
+
+  serialize(serializer: Serializer) {
+    this.num = serializer.float(this.num);
+    this.str = serializer.string(this.str);
+  }
+
+  static create(num: number, str: string) {
+    const k = new SampleObj();
+    k.num = num;
+    k.str = str;
+    return k;
+  }
+}
+oracle.register(5, SampleObj, () => new SampleObj());
 
 describe('Check BufferSerializer', () => {
   it('check for all primitives in read mode', () => {
@@ -33,10 +55,33 @@ describe('Check BufferSerializer', () => {
     expect(() => writer.string("Long One Needs To Cross the 20 bytes limit")).toThrowError();
 
     const reader = new BufferSerializer(1, writer.getBuffer());
-    console.log('Writer buffer', writer.getBuffer().length);
     expect(reader.uint32(0)).toBe(5);
     expect(reader.double(0)).toBe(10);
     expect(() => reader.string(null)).toThrowError();
+  });
+
+  it('check for array serialization', () => {
+    const writer = new BufferSerializer(1, 110);
+    const list = [
+      SampleObj.create(1, 'One'),
+      SampleObj.create(2, 'Two'),
+      SampleObj.create(3, 'Three'),
+      SampleObj.create(4, 'Four'),
+      SampleObj.create(5, 'Five'),
+      SampleObj.create(6, 'Six'),
+      SampleObj.create(7, 'Seven'),
+      SampleObj.create(8, 'Eight'),
+    ];
+
+    const k = writer.larray(list, 0, oracle.serialize);
+    expect(k).toBe(7);
+    expect(writer.getBuffer().byteLength).toBe(99);
+
+    const reader = new BufferSerializer(1, writer.getBuffer());
+    const res = [] as SampleObj[];
+    const k2 = reader.larray(res, 0, oracle.serialize);
+    expect(k2).toBe(7);
+    expect(res.length).toBe(7);
   });
 
   it('check for all primitives in write mode', () => {

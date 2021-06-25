@@ -59,13 +59,16 @@ export class BufferSerializer extends StdSerializer {
   }
 
   string = (k: string): string => {
-    return this.trackLength((length) => {
+    let res = k;
+    this.trackLength((length) => {
       if (this.isLoading) {
-        return uint8ToStr(this.buff, this.offset, length);
+        res = uint8ToStr(this.buff, this.offset, length);
       } else {
-        this.offset += strToUint8(k, this.buff, this.offset);
-        return k;
+        length = strToUint8(k, this.buff, this.offset);
       }
+      this.offset += length;
+      return length;
     });
+    return res;
   }
 }

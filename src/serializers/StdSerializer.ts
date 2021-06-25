@@ -36,61 +36,82 @@ export abstract class StdSerializer implements Serializer {
     return this.offset;
   }
 
-  mark() {
-    const marker = this.offset;
-    return () => {
-      this.offset = marker;
+  track<T>(fn: () => T): T {
+    const mark = this.offset;
+    try {
+      return fn();
+    } catch (err) {
+      this.offset = mark;
+      throw err;
     }
   }
 
-  trackLength<T>(fn: (length: number) => T) {
+  trackLength(fn: (length: number) => number) {
     const mark = this.offset;
     let length = this.uint16(0);
-    const lengthMarker = this.offset;
     try {
-      const r = fn(length);
-      if (!this.isLoading) {
-        length = this.offset - lengthMarker;
+      length = fn(length);
+      if (!this.loading) {
+        const tmp = this.offset;
         this.offset = mark;
         this.uint16(length);
+        this.offset = tmp;
       }
-      // Keep the offset at right position after tracking
-      this.offset = lengthMarker + length;
-      return r;
+      return length;
     } catch (err) {
-      // Reset the offset to original position
       this.offset = mark;
       throw err;
     }
   }
 
   obj<T extends {}>(obj: T, serialize: (obj: T, serializer: Serializer) => void): T {
-    const mark = this.offset;
-    let length = this.uint16(0);
-    const lengthMarker = this.offset;
+    let res = obj || {} as T;
 
-    const res: T = obj || {} as T;
+    this.trackLength((length) => {
+      const mark = this.offset;
+      serialize(res, this);
+      if (this.isLoading) {
+        this.offset = mark + length;
+      }
 
-    serialize(res, this);
-
-    if (!this.isLoading) {
-      length = this.offset - lengthMarker;
-      this.offset = mark;
-      this.uint16(length);
-    }
-
-    this.offset = lengthMarker + length;
+      return this.offset - mark;
+    });
 
     return res;
   }
 
+  /**
+   * Array serialization with a limit
+   * 
+   * @param array 
+   * @param offset 
+   * @param serialize 
+   * @returns 
+   */
+  larray<T>(array: T[], offset: number, serialize: (item: T, serializer: Serializer) => T): number {
+    return this.trackLength((len) => {
+      const length = len || (array.length - offset);
+      let i = 0;
+      for (; i < length; i += 1) {
+        try {
+          array[i + offset] = serialize(array[i + offset], this);
+        } catch (err) {
+          break;
+        }
+      }
+      return i;
+    });
+  }
+
   array<T>(array: T[], serialize: (item: T, serializer: Serializer) => T): T[] {
     const res: T[] = array || [];
-
-    const length = this.uint16(res.length);
-    for (let i = 0; i < length; i += 1) {
-      res[i] = serialize(res[i], this);
-    }
+    this.trackLength((len) => {
+      const length = len || array.length;
+      for (let i = 0; i < length; i += 1) {
+        res[i] = serialize(res[i], this);
+      }
+      return res.length
+    });
 
     return res;
   }

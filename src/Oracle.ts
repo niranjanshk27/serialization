@@ -39,11 +39,12 @@ export class Oracle {
     return ctor() as T;
   }
 
-  serialize<T extends Serializable>(obj: T, serializer: Serializer): T {
-    const id = serializer.int16(Oracle.identify(obj));
-    if (id === 0) return null;
-
-    const res = obj || this.createObject(id);
-    return serializer.obj(res, k => k.serialize(serializer, this));
+  serialize = <T extends Serializable> (obj: T, serializer: Serializer): T => {
+    return serializer.track(() => {
+      const id = serializer.int16(Oracle.identify(obj));
+      if (id === 0) return null;
+      const res = obj || this.createObject(id);
+      return serializer.obj(res, k => k.serialize(serializer, this));
+    });
   }
 }
