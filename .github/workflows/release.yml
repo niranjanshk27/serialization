@@ -23,3 +23,5 @@ jobs:
           echo "Releasing ${pkg}@${version} to latest"
           # The following command doesn't work with `yarn tag`
           npm dist-tag add ${pkg}@${version} latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
