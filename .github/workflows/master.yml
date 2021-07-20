@@ -1,12 +1,9 @@
-# When any change is pushed on master, it is merged into
-# a corresponding release branch (Ex: releases/1.0) which
-# triggers a beta version release with @beta tag
+# When any change is pushed on master, it triggers a beta
+# version release with the @next tag 
 #
-# When a release itself is merged into master, then the
-# beta version is promoted to staging and available with
-# @next tag. At the same time a Github Release is created
-# with 'prerelease' flag which could be released to
-# promote the staging version to latest production.
+# When a tag is published, it triggers the release flow,
+# which takes the version which is released and converts
+# it into the @latest tag
 name: Process master branch updates
 
 on:
@@ -22,6 +19,9 @@ jobs:
       - run: |
           git config user.name bhoos-devops
           git config user.email devops@bhoos.com
+          echo -e "github.com\n  login $GITHUB_TOKEN" >> ~/.netrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v1
         with:
@@ -43,54 +43,26 @@ jobs:
           echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
           echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
           
-      - name: Create Release Branch ${{ env.RELEASE_BRANCH }} from master
-        if: contains(env.REMOTE_BRANCH, env.RELEASE_BRANCH) != true
+       - name: Install Dependencies and publish packages
         run: |
-          gh api repos/:owner/:repo/git/refs -F ref="refs/heads/${RELEASE_BRANCH}" -F sha="${{github.sha}}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Detect Staging Release
-        env:
-          GITHUB_COMMITS: ${{ toJSON(github.event.commits) }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          releaseInfo=$(gh api /repos/:owner/:repo/git/ref/heads/${{ env.RELEASE_BRANCH }})
-          releaseSha=$(node -p "k=${releaseInfo}; k.object.sha")
-          # The master branch has the release commit on the pen ulitimate position when the branch is being merged from release
-          code="c=$GITHUB_COMMITS; k=c && c[c.length-2]; k && k.id"
-          masterSha=$(node -p "$code")
-          if [ "$releaseSha" = "$masterSha" ]; then staging="YES"; else staging="NO"; fi
-          echo "STAGING=${staging}" >> $GITHUB_ENV
-
-      # Push the changes to release branch using PERSONAL ACCESS TOKEN
-      # since we want the github action to be triggered
-      - name: Push changes to release branch
-        if: env.STAGING == 'NO'
-        run: |
-          gh api repos/:owner/:repo/merges -F base="${{ env.RELEASE_BRANCH }}" -F head="${{github.sha}}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Promote to Staging
-        if: env.STAGING == 'YES'
-        run: |
-          echo "PR request merged for staging"
-          pkg=$(node -p "require('./package.json').name")
+          yarn
+          yarn patch
           version=$(node -p "require('./package.json').version")
           echo "RELEASE_VERSION=${version}" >> $GITHUB_ENV
-          npm dist-tag add ${pkg}@${version} next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Create Prerelease for moving to production
-        if: env.STAGING == 'YES'
-        uses: actions/create-release@v1
-        env: 
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v1
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release for moving to production
+        uses: actions/create-release@v1
         with:
           tag_name: ${{ env.RELEASE_VERSION }}
-          release_name: Release ${{ env.RELEASE_VERSION }}
-          commitish: ${{ github.sha }}
-          draft: false
-          prerelease: true
+          release_name: Release v${{ env.RELEASE_VERSION }}
+          body: ${{steps.github_release.outputs.changelog}}
+          draft: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
