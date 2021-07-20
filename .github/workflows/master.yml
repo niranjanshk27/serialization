@@ -42,8 +42,8 @@ jobs:
           echo "VERSION=${version}" >> $GITHUB_ENV
           echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
           echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
-          
-       - name: Install Dependencies and publish packages
+        
+      - name: Install Dependencies and publish packages
         run: |
           yarn
           yarn patch
