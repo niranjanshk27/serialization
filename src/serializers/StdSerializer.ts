@@ -106,7 +106,7 @@ export abstract class StdSerializer implements Serializer {
   array<T>(array: T[], serialize: (item: T, serializer: Serializer) => T): T[] {
     const res: T[] = array || [];
     this.trackLength((len) => {
-      const length = len || array.length;
+      const length = len || res.length;
       for (let i = 0; i < length; i += 1) {
         res[i] = serialize(res[i], this);
       }
