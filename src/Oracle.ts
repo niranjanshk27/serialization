@@ -24,7 +24,7 @@ export class Oracle {
       throw new Error(`Can't register Serializable ${k.name} with ${id}, it has already been registered with ${k.SERIAL_ID}`);
     }
     if (this.serializables.has(id)) {
-      throw new Error(`Serializable class is already registered for ${id}`);
+      throw new Error(`Serializable class is already registered for ${id} - ${k.name}`);
     }
 
     k.SERIAL_ID = id;
