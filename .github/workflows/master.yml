@@ -24,6 +24,21 @@ jobs:
           node-version: '12.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@bhoos'
+
+      - name: Generate version information
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_COMMITS: ${{ toJSON(github.event.commits) }}
+        run: |
+          # Get the major and minor version part only
+          version=$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")
+          # Use release branch of format `releases/X.X`
+          releaseBranch=releases/${version}
+          remoteBranch=$(git ls-remote origin ${releaseBranch})
+          echo "VERSION=${version}" >> $GITHUB_ENV
+          echo "RELEASE_BRANCH=${releaseBranch}" >> $GITHUB_ENV
+          echo "REMOTE_BRANCH=${remoteBranch}" >> $GITHUB_ENV
+          
       - name: Install Dependencies and publish packages
         run: |
           yarn
