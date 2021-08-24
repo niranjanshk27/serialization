@@ -22,7 +22,7 @@
     "build": "yarn build:cjs && yarn build:es6",
     "prepublishOnly": "yarn clean && yarn build",
     "preversion": "yarn test",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "@bhoos/utils": "^1.0.0"
