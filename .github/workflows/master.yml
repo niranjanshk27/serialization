@@ -27,21 +27,23 @@ jobs:
       - name: Install Dependencies and publish packages
         run: |
           yarn
-          yarn patch
           version=$(node -p "require('./package.json').version")
-          echo "RELEASE_VERSION=${version}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=v${version}" >> $GITHUB_ENV
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v1
+        with:
+          configuration: "workflow_config/config.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release for moving to production
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ env.RELEASE_VERSION }}
-          release_name: Release v${{ env.RELEASE_VERSION }}
+          tag: ${{ env.RELEASE_VERSION }}
+          name: Release ${{ env.RELEASE_VERSION }}
+          commit: master
           body: ${{steps.github_release.outputs.changelog}}
           draft: true
           prerelease: false
